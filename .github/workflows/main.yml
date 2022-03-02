@@ -1,0 +1,25 @@
+name: GitEvents ICS
+
+on: workflow_dispatch
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - run: npm install
+      - run: npm run build
+      - name: local testing
+        uses: ./
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          default-timezone: 'Europe/Athens'
+          locations: 'locations.json'
+      - uses: actions/checkout@v3
+      - run: |
+          git config user.name gitevents[bot]
+          git config user.email ics@gitevents.org
+          git add events.ics
+          git commit -m "update calendar file"
+          git push

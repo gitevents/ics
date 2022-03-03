@@ -10,12 +10,9 @@ async function run() {
   const locationsFile = core.getInput('locations')
 
   const octokit = github.getOctokit(repoToken)
-  const context = github.context
-  console.log(context)
 
   const events = await fetchIssues(octokit, locationsFile)
-  const result = await createIcs(events)
-  console.log(result)
+  await createIcs(events)
 }
 
 run()

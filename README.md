@@ -67,6 +67,7 @@ Example `locations.json` file:
 
 ## Known issues and TODOs
 
+- add xml/json/atom rss feed
 - add tests
 - recurring events
 - add more flexibility to date and time parser

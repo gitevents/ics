@@ -1,7 +1,6 @@
-import matter from 'gray-matter'
-import moment from 'moment'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
+import bodyParser from '@zentered/issue-forms-body-parser'
 
 export async function fetchIssues(octokit, locationsFile) {
   let locations = []
@@ -66,28 +65,22 @@ export async function fetchIssues(octokit, locationsFile) {
   const events = []
   for (const edge of response.repository.issues.edges) {
     const issue = edge.node
-    const { content, data } = matter(issue.body)
+    const parsedBody = await bodyParser(issue.body)
 
-    if (!data) {
-      return { error: 'no event data found' }
-    }
+    const startTime = parsedBody.find((i) => i.id === 'time')
+    const startDate = parsedBody.find((i) => i.id === 'date')
+    const duration = parsedBody.find((i) => i.id === 'duration')
+    const content = parsedBody.find((i) => i.id === 'description')
+    const location = parsedBody.find((i) => i.id === 'location')
 
-    const startDate = data.startDate.split('.').reverse()
-    const startTime = parseFloat(data.startTime)
-      .toFixed(2)
-      .toString()
-      .split('.')
-    const duration = moment.duration(
-      `PT${data.duration.replace(/\s/g, '').toUpperCase()}`
-    )
+    const dateParts = startDate.date.split('.')
+    const timeParts = startTime.time.split(':')
+    const fullDate = dateParts.concat(timeParts)
 
     const event = {
       productId: 'gitevents/ics',
-      start: startDate.concat(startTime).map((n) => parseInt(n)),
-      duration: {
-        hours: duration.get('hours'),
-        minutes: duration.get('minutes')
-      },
+      start: new Date(fullDate),
+      duration: duration.text,
       title: issue.title,
       description: content,
       url: issue.url,
@@ -106,14 +99,14 @@ export async function fetchIssues(octokit, locationsFile) {
     }
 
     if (locations && locations.length > 0) {
-      const location = locations.find((l) => l.id === data.location)
+      const location = locations.find((l) => l.id === location)
       event.location = location.name
       if (location.geo) {
         const [lat, lon] = location.geo
         event.geo = { lat, lon }
       }
     } else {
-      event.location = data.location
+      event.location = location
     }
 
     events.push(event)

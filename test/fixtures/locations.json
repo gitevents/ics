@@ -1,0 +1,19 @@
+[
+  {
+    "id": "online",
+    "name": "Online on Discord"
+  },
+  {
+    "id": "idea-cy",
+    "name": "IDEA Cyprus, Nicosia",
+    "city": "Nicosia",
+    "geo": [35.172405, 33.36224]
+  },
+  {
+    "id": "baracas-lounge",
+    "name": "Baracas Lounge",
+    "city": "Paphos",
+    "link": "https://maps.apple.com/?address=8220,%20Cyprus&auid=7890113038827408012&ll=34.807858,32.394523&lsp=9902&q=Baracas%20Lounge",
+    "geo": [34.807858, 32.394523]
+  }
+]

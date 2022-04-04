@@ -15,11 +15,4 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           default-timezone: 'Europe/Athens'
-          locations: 'locations.json'
-      - uses: actions/checkout@v3
-      - run: |
-          git config user.name gitevents[bot]
-          git config user.email ics@gitevents.org
-          git add events.ics
-          git commit -m "update calendar file"
-          git push
+          locations: 'test/fixtures/locations.json'

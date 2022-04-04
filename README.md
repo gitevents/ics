@@ -44,6 +44,8 @@ Local development and testing works with [act](https://github.com/nektos/act).
 
 ```
     $ act
+    $ act --list
+    $ act workflow_dispatch
 ```
 
 The github token can be stored in `.secrets`:

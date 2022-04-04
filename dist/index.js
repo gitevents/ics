@@ -66342,14 +66342,14 @@ var __webpack_exports__ = {}
     'dd.MM.yy'
   ]
 
-  const commonTimeFormats = ['HH:mm', 'hh:mm a', 'hh:mm A']
+  const commonTimeFormats = ['HH:mm', 'HH.mm', 'hh:mm a', 'hh:mm A']
 
   function parse_parseDate(text) {
     const match = commonDateFormats.map((format) => {
       return (0, date_fns.isMatch)(text, format)
     })
     if (match.indexOf(true) > -1) {
-      return zonedTimeToUtc(
+      const date = zonedTimeToUtc(
         (0, date_fns.parse)(
           text,
           commonDateFormats[match.indexOf(true)],
@@ -66357,6 +66357,7 @@ var __webpack_exports__ = {}
         ),
         loc
       ).toJSON()
+      return date.split('T')[0]
     } else {
       return null
     }
@@ -66463,7 +66464,9 @@ var __webpack_exports__ = {}
       locations = JSON.parse(file)
     }
 
-    const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
+    // const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
+    const [owner, repo] = ['cyprus-developer-community', 'events']
+
     const response = await octokit.graphql(
       `
     query lastIssues($owner: String!, $repo: String!) {
@@ -66529,52 +66532,51 @@ var __webpack_exports__ = {}
         const location = parsedBody.find((i) => i.id === 'location')
 
         let fullDate = ''
-        if (
-          startDate &&
-          startDate.date &&
-          startDate.date.length > 0 &&
-          startDate.time
-        ) {
+        if (startDate && startDate.date && startDate.date && startDate.time) {
           const dateParts = startDate.date.split('.')
           const timeParts = startTime.time.split(':')
-          fullDate = new Date(dateParts.concat(timeParts))
-        } else {
-          fullDate = `${startDate} ${startTime}`
-        }
+          fullDate = dateParts.concat(timeParts)
 
-        const event = {
-          productId: 'gitevents/ics',
-          start: fullDate,
-          duration: duration.text,
-          title: issue.title,
-          description: content,
-          url: issue.url,
-          categories: issue.labels.nodes.map((l) => l.name),
-          status: 'CONFIRMED',
-          busyStatus: 'BUSY',
-          organizer: { name: issue.author.name },
-          attendees: issue.reactions.edges.map((r) => {
-            return {
-              name: r.node.user.name,
-              rsvp: true,
-              partstat: 'ACCEPTED',
-              dir: r.node.user.url
-            }
-          })
-        }
-
-        if (locations && locations.length > 0) {
-          const location = locations.find((l) => l.id === location)
-          event.location = location.name
-          if (location.geo) {
-            const [lat, lon] = location.geo
-            event.geo = { lat, lon }
+          const event = {
+            productId: 'gitevents/ics',
+            start: fullDate,
+            duration: duration.text,
+            title: issue.title,
+            description: content,
+            url: issue.url,
+            categories: issue.labels.nodes.map((l) => l.name),
+            status: 'CONFIRMED',
+            busyStatus: 'BUSY',
+            organizer: { name: issue.author.name },
+            attendees: issue.reactions.edges.map((r) => {
+              return {
+                name: r.node.user.name,
+                rsvp: true,
+                partstat: 'ACCEPTED',
+                dir: r.node.user.url
+              }
+            })
           }
-        } else {
-          event.location = location
-        }
 
-        events.push(event)
+          if (locations && locations.length > 0) {
+            const locationLookup = locations.find((l) => l.id === location.id)
+            if (!locationLookup) {
+              event.location = location.text
+            } else {
+              event.location = locationLookup.name
+              if (locationLookup.geo) {
+                const [lat, lon] = locationLookup.geo
+                event.geo = { lat, lon }
+              }
+            }
+          } else {
+            event.location = location
+          }
+
+          events.push(event)
+        }
+      } else {
+        console.log('there was an error parsing date and time')
       }
     }
 

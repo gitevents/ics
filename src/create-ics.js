@@ -4,7 +4,7 @@ import { join } from 'path'
 
 export async function createIcs(events) {
   const { error, value } = ics.createEvents(events)
-  if (error) {
+  if (error || !value || value.length <= 0) {
     console.error(error)
     return
   } else {

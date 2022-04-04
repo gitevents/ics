@@ -44615,7 +44615,7 @@ var __webpack_exports__ = {}
   var external_path_ = __nccwpck_require__(71017) // CONCATENATED MODULE: ./src/create-ics.js
   async function createIcs(events) {
     const { error, value } = ics.createEvents(events)
-    if (error) {
+    if (error || !value || value.length <= 0) {
       console.error(error)
       return
     } else {

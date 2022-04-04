@@ -66517,6 +66517,11 @@ var __webpack_exports__ = {}
       const issue = edge.node
       const parsedBody = await parseMD(issue.body)
 
+      if (Object.keys(parsedBody).length <= 0) {
+        console.error('invalid issue-form data.')
+        return
+      }
+
       const startTime = parsedBody.find((i) => i.id === 'time')
       const startDate = parsedBody.find((i) => i.id === 'date')
       const duration = parsedBody.find((i) => i.id === 'duration')
@@ -66524,7 +66529,12 @@ var __webpack_exports__ = {}
       const location = parsedBody.find((i) => i.id === 'location')
 
       let fullDate = ''
-      if (startDate && startDate.date && startDate.time) {
+      if (
+        startDate &&
+        startDate.date &&
+        startDate.date.length > 0 &&
+        startDate.time
+      ) {
         const dateParts = startDate.date.split('.')
         const timeParts = startTime.time.split(':')
         fullDate = new Date(dateParts.concat(timeParts))

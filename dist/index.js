@@ -66420,10 +66420,12 @@ var __webpack_exports__ = {}
       const current = tokens.children[idx]
       const hasNext = idx + 1 < tokens.children.length
 
-      const obj = {}
       if (current.type === 'heading') {
-        obj.id = slugify(current.children[0].value)
-        obj.title = current.children[0].value
+        // issue-form answers start with a h3 heading, ignore everything else
+        const obj = {
+          id: slugify(current.children[0].value),
+          title: current.children[0].value
+        }
         if (hasNext) {
           const next = tokens.children[idx + 1]
           if (next.type === 'list') {
@@ -66442,8 +66444,8 @@ var __webpack_exports__ = {}
             obj.time = time
           }
         }
+        r.push(obj)
       }
-      r.push(obj)
     }
 
     return r
@@ -66517,7 +66519,7 @@ var __webpack_exports__ = {}
       const issue = edge.node
       const parsedBody = await parseMD(issue.body)
 
-      if (Object.keys(parsedBody).length <= 0) {
+      if (parsedBody && parsedBody.length <= 0) {
         console.error('invalid issue-form data.')
         return
       }

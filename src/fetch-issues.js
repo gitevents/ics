@@ -67,7 +67,7 @@ export async function fetchIssues(octokit, locationsFile) {
     const issue = edge.node
     const parsedBody = await bodyParser(issue.body)
 
-    if (Object.keys(parsedBody).length <= 0) {
+    if (parsedBody && parsedBody.length <= 0) {
       console.error('invalid issue-form data.')
       return
     }

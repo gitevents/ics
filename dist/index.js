@@ -66521,7 +66521,7 @@ var __webpack_exports__ = {}
       const issue = edge.node
       const parsedBody = await parseMD(issue.body)
 
-      if (parsedBody && parsedBody.length >= 0) {
+      if (parsedBody && parsedBody.length > 0) {
         const startTime = parsedBody.find((i) => i.id === 'time')
         const startDate = parsedBody.find((i) => i.id === 'date')
         const duration = parsedBody.find((i) => i.id === 'duration')

@@ -66344,6 +66344,18 @@ var __webpack_exports__ = {}
 
   const commonTimeFormats = ['HH:mm', 'HH.mm', 'hh:mm a', 'hh:mm A']
 
+  function parseDuration(text) {
+    const duration = {
+      hours: 0,
+      minutes: 0
+    }
+
+    const pieces = text.replace('m', '').split('h')
+    duration.hours = parseInt(pieces[0]) ? parseInt(pieces[0]) : 0
+    duration.minutes = parseInt(pieces[1]) ? parseInt(pieces[1]) : 0
+    return duration
+  }
+
   function parse_parseDate(text) {
     const match = commonDateFormats.map((format) => {
       return (0, date_fns.isMatch)(text, format)
@@ -66446,6 +66458,9 @@ var __webpack_exports__ = {}
           if (time) {
             obj.time = time
           }
+          if (obj.id === 'duration') {
+            obj.duration = parseDuration(obj.text)
+          }
         }
         r.push(obj)
       }
@@ -66464,8 +66479,8 @@ var __webpack_exports__ = {}
       locations = JSON.parse(file)
     }
 
-    // const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
-    const [owner, repo] = ['cyprus-developer-community', 'events']
+    const [owner, repo] = process.env.GITHUB_REPOSITORY.split('/')
+    // const [owner, repo] = ['cyprus-developer-community', 'events']
 
     const response = await octokit.graphql(
       `
@@ -66528,21 +66543,21 @@ var __webpack_exports__ = {}
         const startTime = parsedBody.find((i) => i.id === 'time')
         const startDate = parsedBody.find((i) => i.id === 'date')
         const duration = parsedBody.find((i) => i.id === 'duration')
-        const content = parsedBody.find((i) => i.id === 'description')
+        const content = parsedBody.find((i) => i.id === 'event-description')
         const location = parsedBody.find((i) => i.id === 'location')
 
         let fullDate = ''
-        if (startDate && startDate.date && startDate.date && startDate.time) {
-          const dateParts = startDate.date.split('.')
+        if (startDate && startDate.date && startTime.time) {
+          const dateParts = startDate.date.split('-')
           const timeParts = startTime.time.split(':')
-          fullDate = dateParts.concat(timeParts)
+          fullDate = dateParts.concat(timeParts).map((d) => parseInt(d))
 
           const event = {
             productId: 'gitevents/ics',
             start: fullDate,
-            duration: duration.text,
+            duration: duration.duration,
             title: issue.title,
-            description: content,
+            description: content.text,
             url: issue.url,
             categories: issue.labels.nodes.map((l) => l.name),
             status: 'CONFIRMED',

@@ -73,13 +73,18 @@ export async function fetchIssues(octokit, locationsFile) {
     const content = parsedBody.find((i) => i.id === 'description')
     const location = parsedBody.find((i) => i.id === 'location')
 
-    const dateParts = startDate.date.split('.')
-    const timeParts = startTime.time.split(':')
-    const fullDate = dateParts.concat(timeParts)
+    let fullDate = ''
+    if (startDate && startDate.date && startDate.time) {
+      const dateParts = startDate.date.split('.')
+      const timeParts = startTime.time.split(':')
+      fullDate = new Date(dateParts.concat(timeParts))
+    } else {
+      fullDate = `${startDate} ${startTime}`
+    }
 
     const event = {
       productId: 'gitevents/ics',
-      start: new Date(fullDate),
+      start: fullDate,
       duration: duration.text,
       title: issue.title,
       description: content,

@@ -6,8 +6,10 @@ export async function createIcs(events) {
   const { error, value } = ics.createEvents(events)
   if (error) {
     console.error(error)
+    return
+  } else {
+    return writeFile(join(process.cwd(), 'events.ics'), value, {
+      encoding: 'utf8'
+    })
   }
-  return writeFile(join(process.cwd(), 'events.ics'), value, {
-    encoding: 'utf8'
-  })
 }

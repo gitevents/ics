@@ -85,8 +85,6 @@ export async function fetchIssues(
       if (startDate && startDate.date && startTime.time) {
         const zonedDateTime = `${startDate.date}T${startTime.time}`
 
-        // GitHub Actions run on UTC, but for testing we also need zoned dates to work.
-        // "format()" will convert the time back to the system timezone, we don't want that.
         const utcDate = zonedTimeToUtc(zonedDateTime, timeZone)
           .toJSON()
           .split(/[-,T,:,.]+/)

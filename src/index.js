@@ -7,10 +7,12 @@ async function run() {
   core.info('Starting GitEvents ICS ...')
   const repoToken = core.getInput('repo-token')
   const locationsFile = core.getInput('locations')
+  const timeZone = core.getInput('default-timezone')
 
   const octokit = github.getOctokit(repoToken)
 
-  const events = await fetchIssues(octokit, locationsFile)
+  const events = await fetchIssues(octokit, locationsFile, timeZone)
+
   await createIcs(events)
 }
 

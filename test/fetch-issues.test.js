@@ -3,6 +3,8 @@
 import t from 'tap'
 const test = t.test
 import { fetchIssues as fn } from '../src/fetch-issues.js'
+import ics from 'ics'
+
 // import response from './fixtures/repo-issues.json' assert { type: 'json' }
 const response = {
   repository: {
@@ -62,5 +64,11 @@ test('fetchIssues() returns parsed issues/events', async (t) => {
   }
 
   const actual = await fn(octokit)
+  const { error, value } = ics.createEvents(actual)
+  const lines = value.split(/\n/g)
+  t.deepEqual(actual[0].start, [2022, 3, 11, 14, 0])
+  t.equal(lines[10], 'DTSTART:20220311T120000Z\r')
   t.ok(actual)
+  t.ok(value)
+  t.notOk(error)
 })

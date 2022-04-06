@@ -1,8 +1,14 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import bodyParser from '@zentered/issue-forms-body-parser'
+import pkg from 'date-fns-tz'
+const { zonedTimeToUtc } = pkg
 
-export async function fetchIssues(octokit, locationsFile) {
+export async function fetchIssues(
+  octokit,
+  locationsFile,
+  timeZone = 'Europe/Nicosia'
+) {
   let locations = []
   if (locationsFile) {
     const file = await readFile(join(process.cwd(), locationsFile), 'utf8')
@@ -76,15 +82,20 @@ export async function fetchIssues(octokit, locationsFile) {
       const content = parsedBody.find((i) => i.id === 'event-description')
       const location = parsedBody.find((i) => i.id === 'location')
 
-      let fullDate = ''
       if (startDate && startDate.date && startTime.time) {
-        const dateParts = startDate.date.split('-')
-        const timeParts = startTime.time.split(':')
-        fullDate = dateParts.concat(timeParts).map((d) => parseInt(d))
+        const zonedDateTime = `${startDate.date}T${startTime.time}`
+
+        // GitHub Actions run on UTC, but for testing we also need zoned dates to work.
+        // "format()" will convert the time back to the system timezone, we don't want that.
+        const utcDate = zonedTimeToUtc(zonedDateTime, timeZone)
+          .toJSON()
+          .split(/[-,T,:,.]+/)
+          .splice(0, 5)
+          .map((i) => parseInt(i))
 
         const event = {
           productId: 'gitevents/ics',
-          start: fullDate,
+          start: utcDate,
           duration: duration.duration,
           title: issue.title,
           description: content.text,
@@ -115,7 +126,7 @@ export async function fetchIssues(octokit, locationsFile) {
             }
           }
         } else {
-          event.location = location
+          event.location = location.text
         }
 
         events.push(event)

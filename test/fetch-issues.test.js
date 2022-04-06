@@ -67,7 +67,7 @@ test('fetchIssues() returns parsed issues/events', async (t) => {
   const { error, value } = ics.createEvents(actual)
   const lines = value.split(/\n/g)
   t.deepEqual(actual[0].start, [2022, 3, 11, 14, 0])
-  t.equal(lines[10], 'DTSTART:20220311T120000Z\r')
+  t.equal(lines[10].replace(/[\n\r]/g, ''), 'DTSTART:20220311T120000Z')
   t.ok(actual)
   t.ok(value)
   t.notOk(error)

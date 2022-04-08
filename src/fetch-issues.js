@@ -75,12 +75,12 @@ export async function fetchIssues(
     const issue = edge.node
     const parsedBody = await bodyParser(issue.body)
 
-    if (parsedBody && parsedBody.length > 0) {
-      const startTime = parsedBody.find((i) => i.id === 'time')
-      const startDate = parsedBody.find((i) => i.id === 'date')
-      const duration = parsedBody.find((i) => i.id === 'duration')
-      const content = parsedBody.find((i) => i.id === 'event-description')
-      const location = parsedBody.find((i) => i.id === 'location')
+    if (parsedBody && Object.keys(parsedBody).length > 0) {
+      const startTime = parsedBody.time
+      const startDate = parsedBody.date
+      const duration = parsedBody.duration.duration
+      const content = parsedBody['event-description']
+      const location = parsedBody.location
 
       if (startDate && startDate.date && startTime.time) {
         const zonedDateTime = `${startDate.date}T${startTime.time}`
@@ -94,7 +94,7 @@ export async function fetchIssues(
         const event = {
           productId: 'gitevents/ics',
           start: utcDate,
-          duration: duration.duration,
+          duration: duration,
           title: issue.title,
           description: content.text,
           url: issue.url,

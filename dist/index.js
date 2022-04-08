@@ -66567,7 +66567,22 @@ var __webpack_exports__ = {}
     Object.assign(this, { Compiler: compiler })
   } // CONCATENATED MODULE: ./node_modules/remark-stringify/index.js
 
-  /* harmony default export */ const remark_stringify = remarkStringify
+  /* harmony default export */ const remark_stringify = remarkStringify // CONCATENATED MODULE: ./node_modules/@zentered/issue-forms-body-parser/node_modules/strip-final-newline/index.js
+
+  function stripFinalNewline(input) {
+    const LF = typeof input === 'string' ? '\n' : '\n'.charCodeAt()
+    const CR = typeof input === 'string' ? '\r' : '\r'.charCodeAt()
+
+    if (input[input.length - 1] === LF) {
+      input = input.slice(0, -1)
+    }
+
+    if (input[input.length - 1] === CR) {
+      input = input.slice(0, -1)
+    }
+
+    return input
+  }
 
   // EXTERNAL MODULE: ./node_modules/date-fns/index.js
   var date_fns = __nccwpck_require__(73314)
@@ -67356,6 +67371,36 @@ var __webpack_exports__ = {}
     var offsetMilliseconds = tzParseTimezone(timeZone, new Date(utc))
 
     return new Date(utc + offsetMilliseconds)
+  } // CONCATENATED MODULE: ./node_modules/@zentered/issue-forms-body-parser/src/parsers/date.js
+
+  const loc = 'UTC'
+  const commonDateFormats = [
+    'yyyy-MM-dd',
+    'dd/MM/yyyy',
+    'dd/MM/yy',
+    'dd-MM-yyyy',
+    'dd-MM-yy',
+    'dd.MM.yyyy',
+    'dd.MM.yy'
+  ]
+
+  function date_parseDate(text) {
+    const match = commonDateFormats.map((format) => {
+      return (0, date_fns.isMatch)(text, format)
+    })
+    if (match.indexOf(true) > -1) {
+      const date = zonedTimeToUtc(
+        (0, date_fns.parse)(
+          text,
+          commonDateFormats[match.indexOf(true)],
+          new Date()
+        ),
+        loc
+      ).toJSON()
+      return date.split('T')[0]
+    } else {
+      return null
+    }
   }
 
   // EXTERNAL MODULE: ./node_modules/date-fns/format/index.js
@@ -67968,23 +68013,29 @@ var __webpack_exports__ = {}
       formatStr,
       extendedOptions
     )
-  } // CONCATENATED MODULE: ./node_modules/@zentered/issue-forms-body-parser/src/parse.js
+  } // CONCATENATED MODULE: ./node_modules/@zentered/issue-forms-body-parser/src/parsers/time.js
 
-  // if the system time is not UTC, we need to convert it to UTC
-
-  const loc = 'UTC'
-
-  const commonDateFormats = [
-    'yyyy-MM-dd',
-    'dd/MM/yyyy',
-    'dd/MM/yy',
-    'dd-MM-yyyy',
-    'dd-MM-yy',
-    'dd.MM.yyyy',
-    'dd.MM.yy'
-  ]
-
+  const time_loc = 'UTC'
   const commonTimeFormats = ['HH:mm', 'HH.mm', 'hh:mm a', 'hh:mm A']
+
+  function time_parseTime(text) {
+    const match = commonTimeFormats.map((format) => {
+      return (0, date_fns.isMatch)(text, format)
+    })
+    if (match.indexOf(true) > -1) {
+      const time = zonedTimeToUtc(
+        (0, date_fns.parse)(
+          text,
+          commonTimeFormats[match.indexOf(true)],
+          new Date()
+        ),
+        time_loc
+      )
+      return formatInTimeZone(time, time_loc, 'HH:mm')
+    } else {
+      return null
+    }
+  } // CONCATENATED MODULE: ./node_modules/@zentered/issue-forms-body-parser/src/parsers/duration.js
 
   function parseDuration(text) {
     const duration = {
@@ -67996,45 +68047,7 @@ var __webpack_exports__ = {}
     duration.hours = parseInt(pieces[0]) ? parseInt(pieces[0]) : 0
     duration.minutes = parseInt(pieces[1]) ? parseInt(pieces[1]) : 0
     return duration
-  }
-
-  function parse_parseDate(text) {
-    const match = commonDateFormats.map((format) => {
-      return (0, date_fns.isMatch)(text, format)
-    })
-    if (match.indexOf(true) > -1) {
-      const date = zonedTimeToUtc(
-        (0, date_fns.parse)(
-          text,
-          commonDateFormats[match.indexOf(true)],
-          new Date()
-        ),
-        loc
-      ).toJSON()
-      return date.split('T')[0]
-    } else {
-      return null
-    }
-  }
-
-  function parse_parseTime(text) {
-    const match = commonTimeFormats.map((format) => {
-      return (0, date_fns.isMatch)(text, format)
-    })
-    if (match.indexOf(true) > -1) {
-      const time = zonedTimeToUtc(
-        (0, date_fns.parse)(
-          text,
-          commonTimeFormats[match.indexOf(true)],
-          new Date()
-        ),
-        loc
-      )
-      return formatInTimeZone(time, loc, 'HH:mm')
-    } else {
-      return null
-    }
-  }
+  } // CONCATENATED MODULE: ./node_modules/@zentered/issue-forms-body-parser/src/parsers/list.js
 
   function parseList(list) {
     return list.children
@@ -68064,7 +68077,12 @@ var __webpack_exports__ = {}
         }
       })
       .filter((x) => !!x)
-  }
+  } // CONCATENATED MODULE: ./node_modules/@zentered/issue-forms-body-parser/src/parsers/index.js
+
+  const parsers_parseDate = date_parseDate
+  const parsers_parseTime = time_parseTime
+  const parsers_parseDuration = parseDuration
+  const parsers_parseList = parseList // CONCATENATED MODULE: ./node_modules/@zentered/issue-forms-body-parser/src/parse.js
 
   async function parseMD(body) {
     const tokens = await unified().use(remark_parse).use(remarkGfm).parse(body)
@@ -68072,39 +68090,49 @@ var __webpack_exports__ = {}
       return []
     }
 
-    const r = []
+    const r = {}
+    let counter = 0
     for (let idx = 0; idx < tokens.children.length; idx = idx + 2) {
       const current = tokens.children[idx]
       const hasNext = idx + 1 < tokens.children.length
 
       if (current.type === 'heading') {
-        // issue-form answers start with a h3 heading, ignore everything else
+        const key = slugify(current.children[0].value)
+
+        // issue-form answers start with a h3 heading, ignore everything else for now
         const obj = {
-          id: slugify(current.children[0].value),
-          title: current.children[0].value
+          title: current.children[0].value,
+          order: counter++
         }
+
         if (hasNext) {
           const next = tokens.children[idx + 1]
           if (next.type === 'list') {
-            obj.list = parseList(next).flat()
+            obj.list = parsers_parseList(next).flat()
           }
-          obj.text = await unified()
+          const text = await unified()
             .use(remarkGfm)
             .use(remark_stringify)
             .stringify(next)
-          const date = parse_parseDate(obj.text)
-          const time = parse_parseTime(obj.text)
+          obj.text = stripFinalNewline(text)
+
+          const date = parsers_parseDate(obj.text)
+          const time = parsers_parseTime(obj.text)
+
           if (date) {
             obj.date = date
           }
+
           if (time) {
             obj.time = time
           }
-          if (obj.id === 'duration') {
-            obj.duration = parseDuration(obj.text)
+
+          if (key === 'duration') {
+            obj.duration = parsers_parseDuration(obj.text)
           }
+
+          r[key] = obj
         }
-        r.push(obj)
       }
     }
 
@@ -68113,10 +68141,7 @@ var __webpack_exports__ = {}
 
   // EXTERNAL MODULE: ./node_modules/date-fns-tz/index.js
   var date_fns_tz = __nccwpck_require__(14960) // CONCATENATED MODULE: ./src/fetch-issues.js
-  const {
-    format: fetch_issues_format,
-    zonedTimeToUtc: fetch_issues_zonedTimeToUtc
-  } = date_fns_tz
+  const { zonedTimeToUtc: fetch_issues_zonedTimeToUtc } = date_fns_tz
 
   async function fetchIssues(
     octokit,
@@ -68192,18 +68217,16 @@ var __webpack_exports__ = {}
       const issue = edge.node
       const parsedBody = await parseMD(issue.body)
 
-      if (parsedBody && parsedBody.length > 0) {
-        const startTime = parsedBody.find((i) => i.id === 'time')
-        const startDate = parsedBody.find((i) => i.id === 'date')
-        const duration = parsedBody.find((i) => i.id === 'duration')
-        const content = parsedBody.find((i) => i.id === 'event-description')
-        const location = parsedBody.find((i) => i.id === 'location')
+      if (parsedBody && Object.keys(parsedBody).length > 0) {
+        const startTime = parsedBody.time
+        const startDate = parsedBody.date
+        const duration = parsedBody.duration.duration
+        const content = parsedBody['event-description']
+        const location = parsedBody.location
 
         if (startDate && startDate.date && startTime.time) {
           const zonedDateTime = `${startDate.date}T${startTime.time}`
 
-          // GitHub Actions run on UTC, but for testing we also need zoned dates to work.
-          // "format()" will convert the time back to the system timezone, we don't want that.
           const utcDate = fetch_issues_zonedTimeToUtc(zonedDateTime, timeZone)
             .toJSON()
             .split(/[-,T,:,.]+/)
@@ -68213,7 +68236,7 @@ var __webpack_exports__ = {}
           const event = {
             productId: 'gitevents/ics',
             start: utcDate,
-            duration: duration.duration,
+            duration: duration,
             title: issue.title,
             description: content.text,
             url: issue.url,

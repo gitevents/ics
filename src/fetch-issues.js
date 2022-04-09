@@ -42,6 +42,7 @@ export async function fetchIssues(
               }
               author {
                 ... on User {
+                  login
                   name
                   url
                 }
@@ -51,6 +52,7 @@ export async function fetchIssues(
                   node {
                     user {
                       name
+                      login
                       url
                     }
                   }
@@ -91,6 +93,11 @@ export async function fetchIssues(
           .splice(0, 5)
           .map((i) => parseInt(i))
 
+        const organizer =
+          issue.author.name && issue.author.name.length > 0
+            ? issue.author.name
+            : issue.author?.login
+
         const event = {
           productId: 'gitevents/ics',
           start: utcDate,
@@ -101,10 +108,13 @@ export async function fetchIssues(
           categories: issue.labels.nodes.map((l) => l.name),
           status: 'CONFIRMED',
           busyStatus: 'BUSY',
-          organizer: { name: issue.author.name },
+          organizer: { name: organizer },
           attendees: issue.reactions.edges.map((r) => {
             return {
-              name: r.node.user.name,
+              name:
+                r.node.user.name?.length > 0
+                  ? r.node.user.name
+                  : r.node.user.login,
               rsvp: true,
               partstat: 'ACCEPTED',
               dir: r.node.user.url

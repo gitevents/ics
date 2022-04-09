@@ -1,6 +1,8 @@
 # GitEvents ICS Generator
 
-GitEvents ICS Generator is a GitHub Action to fetch and parse Issues and generate an iCalendar (.ics) file which can be hosted and shared for calendar subscriptions.
+GitEvents ICS Generator is a GitHub Action to fetch and parse Issues and
+generate an iCalendar (.ics) file which can be hosted and shared for calendar
+subscriptions.
 
 ## Features
 
@@ -80,4 +82,5 @@ Example `locations.json` file:
 
 Licensed under [MIT](./LICENSE).
 
-Here is a list of all the licenses of our [production dependencies](./dist/licenses.txt)
+Here is a list of all the licenses of our
+[production dependencies](./dist/licenses.txt)

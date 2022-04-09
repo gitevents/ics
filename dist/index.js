@@ -68261,7 +68261,7 @@ var __webpack_exports__ = {}
       if (parsedBody && Object.keys(parsedBody).length > 0) {
         const startTime = parsedBody.time
         const startDate = parsedBody.date
-        const duration = parsedBody.duration.duration
+        const duration = parsedBody.duration?.duration
         const content = parsedBody['event-description']
         const location = parsedBody.location
 

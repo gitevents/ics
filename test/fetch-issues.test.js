@@ -15,7 +15,8 @@ const response = {
             id: 'I_kwDOG7tNxM5E9yP8',
             url: 'https://github.com/gitevents/ics-test/issues/1',
             title: 'testing events',
-            body: "### Event Description\n\nLet's meet for coffee and chat about tech, coding, Cyprus and the newly formed CDC (Cyprus Developer Community).\n\n### Location\n\n[Caffe Nero Finikoudes, Larnaka](https://goo.gl/maps/Bzjxdeat3BSdsUSVA)\n\n### Date\n\n11.03.2022\n\n### Time\n\n16:00\n\n### Duration\n\n2h\n\n### Code of Conduct\n\n- [X] I agree to follow this project's [Code of Conduct](https://berlincodeofconduct.org)",
+            state: 'CLOSED',
+            body: "### Event Description\n\nLet's meet for coffee and chat about tech, coding, Cyprus and the newly formed CDC (Cyprus Developer Community).\n\n### Location\n\n[Caffe Nero Finikoudes, Larnaka](https://goo.gl/maps/Bzjxdeat3BSdsUSVA)\n\n### Date\n\n11.12.2022\n\n### Time\n\n16:00\n\n### Duration\n\n2h\n\n### Code of Conduct\n\n- [X] I agree to follow this project's [Code of Conduct](https://berlincodeofconduct.org)",
             createdAt: '2022-03-02T11:13:46Z',
             updatedAt: '2022-03-02T11:14:04Z',
             labels: {
@@ -74,6 +75,6 @@ test('fetchIssues() returns parsed issues/events', async (t) => {
   t.ok(value)
 
   const lines = value.split(/\n/g)
-  t.deepEqual(actual[0].start, [2022, 3, 11, 14, 0])
-  t.equal(lines[10].replace(/[\n\r]/g, ''), 'DTSTART:20220311T140000Z')
+  t.deepEqual(actual[0].start, [2022, 12, 11, 14, 0])
+  t.equal(lines[10].replace(/[\n\r]/g, ''), 'DTSTART:20221211T140000Z')
 })

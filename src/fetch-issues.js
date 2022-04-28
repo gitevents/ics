@@ -30,6 +30,7 @@ export async function fetchIssues(
           edges {
             node {
               id
+              state
               url
               title
               body
@@ -106,8 +107,8 @@ export async function fetchIssues(
           description: content.text,
           url: issue.url,
           categories: issue.labels.nodes.map((l) => l.name),
-          status: 'CONFIRMED',
           busyStatus: 'BUSY',
+          status: 'CONFIRMED',
           organizer: { name: organizer },
           attendees: issue.reactions.edges.map((r) => {
             return {
@@ -120,6 +121,12 @@ export async function fetchIssues(
               dir: r.node.user.url
             }
           })
+        }
+
+        if (zonedTimeToUtc(zonedDateTime) > new Date()) {
+          if (issue.state === 'CLOSED') {
+            event.status = 'CANCELLED'
+          }
         }
 
         if (locations && locations.length > 0) {

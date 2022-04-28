@@ -68211,6 +68211,7 @@ var __webpack_exports__ = {}
           edges {
             node {
               id
+              state
               url
               title
               body
@@ -68287,8 +68288,8 @@ var __webpack_exports__ = {}
             description: content.text,
             url: issue.url,
             categories: issue.labels.nodes.map((l) => l.name),
-            status: 'CONFIRMED',
             busyStatus: 'BUSY',
+            status: 'CONFIRMED',
             organizer: { name: organizer },
             attendees: issue.reactions.edges.map((r) => {
               return {
@@ -68301,6 +68302,12 @@ var __webpack_exports__ = {}
                 dir: r.node.user.url
               }
             })
+          }
+
+          if (fetch_issues_zonedTimeToUtc(zonedDateTime) > new Date()) {
+            if (issue.state === 'CLOSED') {
+              event.status = 'CANCELLED'
+            }
           }
 
           if (locations && locations.length > 0) {

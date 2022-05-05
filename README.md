@@ -40,6 +40,38 @@ jobs:
           git push
 ```
 
+### Hosting the .ics file
+
+This action creates / updates a file (`events.ics` in the example above) with
+the current calendar, once a day. Unfortunately, the `mime-type` is set to
+`text/plain`, so some calendar apps don't understand this is a calendar file.
+
+If you're using CloudFlare, you can create a CloudFlare Worker to host this on
+your own domain with the appropriate headers. Just create a new service and a
+HTTP Route to the worker:
+
+```
+addEventListener("fetch", event => {
+  event.respondWith(handleRequest(event.request))
+})
+
+async function handleRequest(request) {
+  const ics = await fetch('https://raw.githubusercontent.com/cyprus-developer-community/events/main/events.ics')
+  const res = new Response(ics.body, ics)
+  res.headers.set('content-type','text/calendar')
+  return res
+}
+```
+
+Replace the URL to your `events.ics` file. Now you can easily subscribe to the
+calendar:
+
+![apple calendar](./assets/apple-calendar.png)
+![google calendar](./assets/google-calendar.png)
+
+Direct link for
+[Google Calendar Subscriptions from URL](https://calendar.google.com/calendar/u/0/r/settings/addbyurl)
+
 ## Development
 
 Local development and testing works with [act](https://github.com/nektos/act).

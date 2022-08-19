@@ -54,7 +54,7 @@
     ]
   },
   "dependencies": {
-    "@actions/core": "^1.6.0",
+    "@actions/core": "^1.9.1",
     "@actions/github": "^5.0.1",
     "@octokit/auth-app": "^3.6.1",
     "@octokit/rest": "^18.12.0",

@@ -1,8 +1,7 @@
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import bodyParser from '@zentered/issue-forms-body-parser'
-import pkg from 'date-fns-tz'
-const { zonedTimeToUtc } = pkg
+import { zonedTimeToUtc } from 'date-fns-tz'
 
 export async function fetchIssues(
   octokit,

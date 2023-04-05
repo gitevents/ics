@@ -8,7 +8,9 @@ inputs:
     description: GITHUB_TOKEN
     required: true
   default-timezone:
-    description: 'Default Timezone ID (https://datatracker.ietf.org/doc/html/rfc5545#section-3.2.19)'
+    description:
+      'Default Timezone ID
+      (https://datatracker.ietf.org/doc/html/rfc5545#section-3.2.19)'
     default: 'Europe/Athens'
     required: true
   locations:

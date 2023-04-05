@@ -74264,7 +74264,7 @@ var __webpack_exports__ = {}
       'dd.MM.yyyy',
       'dd.MM.yy'
     ],
-    s = ['HH:mm', 'HH.mm', 'hh:mm a', 'hh:mm A'],
+    s = ['HH:mm', 'HH.mm', 'hh:mm aaa', 'hh:mm a..aa', 'hh:mm aaaa'],
     d = function n(t) {
       return t.children
         .map(function (e) {
@@ -74315,7 +74315,7 @@ var __webpack_exports__ = {}
   }
   var p = function (p) {
     try {
-      var g, b, M, x, w, k, O, A, I, j, H, S, T
+      var g, b, M, x, w, k, O, I, j, A, H, S, T
       return Promise.resolve(
         unified().use(remark_parse).use(remarkGfm).parse(p)
       ).then(function (t) {
@@ -74380,8 +74380,8 @@ var __webpack_exports__ = {}
               o = o.s
             }
           }
-          var u = new y(),
-            a = m.bind(null, u, 2)
+          var a = new y(),
+            u = m.bind(null, a, 2)
           return (
             (0 === r
               ? i.then(l)
@@ -74390,28 +74390,28 @@ var __webpack_exports__ = {}
               : (void 0).then(function () {
                   ;(i = n())
                     ? i.then
-                      ? i.then(l).then(void 0, a)
+                      ? i.then(l).then(void 0, u)
                       : l(i)
-                    : m(u, 1, o)
+                    : m(a, 1, o)
                 })
-            ).then(void 0, a),
-            u
+            ).then(void 0, u),
+            a
           )
           function f(t) {
             o = t
             do {
-              if (!(i = n()) || (v(i) && !i.v)) return void m(u, 1, o)
-              if (i.then) return void i.then(l).then(void 0, a)
+              if (!(i = n()) || (v(i) && !i.v)) return void m(a, 1, o)
+              if (i.then) return void i.then(l).then(void 0, u)
               v((o = e())) && (o = o.v)
             } while (!o || !o.then)
-            o.then(f).then(void 0, a)
+            o.then(f).then(void 0, u)
           }
           function l(n) {
             n
               ? (o = e()) && o.then
-                ? o.then(f).then(void 0, a)
+                ? o.then(f).then(void 0, u)
                 : f(o)
-              : m(u, 1, o)
+              : m(a, 1, o)
           }
         })(
           function () {
@@ -74470,7 +74470,7 @@ var __webpack_exports__ = {}
                         }
                         return null
                       })(x)),
-                      (A = (function (n) {
+                      (I = (function (n) {
                         var t = !1,
                           e = { hours: 0, minutes: 0 },
                           r = new RegExp(/([0-9]+)h([0-9]+)m/),
@@ -74478,25 +74478,25 @@ var __webpack_exports__ = {}
                         if (n.match(r)) {
                           t = !0
                           var o = n.match(r),
-                            u = o[2]
-                          ;(e.hours = parseInt(o[1])), (e.minutes = parseInt(u))
+                            a = o[2]
+                          ;(e.hours = parseInt(o[1])), (e.minutes = parseInt(a))
                         } else if (n.match(i)) {
                           t = !0
-                          var a = n.match(i)
-                          ;(e.hours = parseInt(a[1])), (e.minutes = 0)
+                          var u = n.match(i)
+                          ;(e.hours = parseInt(u[1])), (e.minutes = 0)
                         }
                         return t ? e : null
                       })(x)),
                       k && (w.date = k),
                       O && (w.time = O),
-                      A && (w.duration = A),
+                      I && (w.duration = I),
                       w.content.push(x))
                     : 'list' === M.type
-                    ? (((I = U[C]).text = x), (I.list = d(M).flat()))
+                    ? (((j = U[C]).text = x), (j.list = d(M).flat()))
                     : 'html' === M.type
                     ? U[C].content.push(M.html)
                     : 'code' === M.type
-                    ? (((j = U[C]).lang = M.lang), (j.text = x))
+                    ? (((A = U[C]).lang = M.lang), (A.text = x))
                     : process.env.DEBUG &&
                       (console.log('unhandled token type'), console.log(M))
               })
@@ -74669,6 +74669,7 @@ var __webpack_exports__ = {}
             })
           }
 
+          // TODO: check if the event is in the future
           if (zonedTimeToUtc(zonedDateTime) > new Date()) {
             if (issue.state === 'CLOSED') {
               event.status = 'CANCELLED'

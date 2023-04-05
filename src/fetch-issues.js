@@ -122,6 +122,7 @@ export async function fetchIssues(
           })
         }
 
+        // TODO: check if the event is in the future
         if (zonedTimeToUtc(zonedDateTime) > new Date()) {
           if (issue.state === 'CLOSED') {
             event.status = 'CANCELLED'

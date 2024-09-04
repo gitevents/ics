@@ -77,4 +77,5 @@ test('fetchIssues() returns parsed issues/events', async (t) => {
   const lines = value.split(/\n/g)
   t.match(actual[0].start, [2022, 12, 11, 14, 0])
   t.equal(lines[10].replace(/[\n\r]/g, ''), 'DTSTART:20221211T140000Z')
+  t.end()
 })

@@ -1,7 +1,6 @@
 'use strict'
-
-import t from 'tap'
-const test = t.test
+import { test } from 'node:test'
+import assert from 'node:assert'
 import { fetchIssues as fn } from '../src/fetch-issues.js'
 import ics from 'ics'
 
@@ -57,7 +56,7 @@ const response = {
   }
 }
 
-test('fetchIssues() returns parsed issues/events', async (t) => {
+test('fetchIssues() returns parsed issues/events', async () => {
   const octokit = {
     graphql: function () {
       return response
@@ -65,17 +64,16 @@ test('fetchIssues() returns parsed issues/events', async (t) => {
   }
 
   const actual = await fn(octokit)
-  t.ok(actual)
+  console.log(actual)
+  assert.ok(actual)
 
   const { error, value } = ics.createEvents(actual)
   if (error) {
-    console.error(error)
-    t.fail(error)
+    assert.fail(error)
   }
-  t.ok(value)
+  assert.ok(value)
 
   const lines = value.split(/\n/g)
-  t.match(actual[0].start, [2022, 12, 11, 14, 0])
-  t.equal(lines[10].replace(/[\n\r]/g, ''), 'DTSTART:20221211T140000Z')
-  t.end()
+  assert.deepEqual(actual[0].start, [2022, 12, 11, 14, 0])
+  assert.equal(lines[10].replace(/[\n\r]/g, ''), 'DTSTART:20221211T140000Z')
 })

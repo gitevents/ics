@@ -34,8 +34,7 @@
     "release": "run-s lint test build",
     "lint": "eslint .",
     "license-checker": "license-checker --production --onlyAllow=\"MIT;ISC;BSD-3-Clause;BSD-2-Clause;Apache-2.0\"",
-    "test": "TZ=UTC tap --node-arg=--experimental-json-modules --test-env=GITHUB_REPOSITORY=gitevents/ics-test test/*.test.js",
-    "test:report": "tap --test-env=GITHUB_REPOSITORY=gitevents/ics-test test/*.test.js --cov",
+    "test": "TZ=UTC GITHUB_REPOSITORY=gitevents/ics-test node --test",
     "postinstall": "husky install",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable"
@@ -77,8 +76,7 @@
     "license-checker": "^25.0.1",
     "npm-run-all": "^4.1.5",
     "pinst": "^3.0.0",
-    "prettier": "^2.8.8",
-    "tap": "^18.8.0"
+    "prettier": "^2.8.8"
   },
   "release": {
     "branches": [

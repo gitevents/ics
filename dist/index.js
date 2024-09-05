@@ -98955,7 +98955,7 @@ var __webpack_exports__ = {}
               }
             }
           } else {
-            event.location = location.text
+            event.location = location.text ? location.text : ''
           }
 
           events.push(event)

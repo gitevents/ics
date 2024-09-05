@@ -141,7 +141,7 @@ export async function fetchIssues(
             }
           }
         } else {
-          event.location = location.text
+          event.location = location.text ? location.text : ''
         }
 
         events.push(event)

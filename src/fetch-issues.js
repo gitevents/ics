@@ -134,19 +134,23 @@ export async function fetchIssues(
           }
         }
 
-        if (locations && locations.length > 0) {
-          const locationLookup = locations.find((l) => l.id === location.id)
-          if (!locationLookup) {
-            event.location = location.text
-          } else {
-            event.location = locationLookup.name
-            if (locationLookup.geo) {
-              const [lat, lon] = locationLookup.geo
-              event.geo = { lat, lon }
+        if (location) {
+          if (locations && locations.length > 0) {
+            const locationLookup = locations.find((l) => l.id === location.id)
+            if (!locationLookup) {
+              event.location = location.text
+            } else {
+              event.location = locationLookup.name
+              if (locationLookup.geo) {
+                const [lat, lon] = locationLookup.geo
+                event.geo = { lat, lon }
+              }
             }
+          } else {
+            event.location = location.text ? location.text : ''
           }
         } else {
-          event.location = location.text ? location.text : ''
+          event.location = ''
         }
 
         events.push(event)

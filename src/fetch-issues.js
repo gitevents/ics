@@ -77,6 +77,11 @@ export async function fetchIssues(
     const issue = edge.node
     const parsedBody = await bodyParser(issue.body)
 
+    if (process.env.DEBUG === 'true') {
+      console.log('issue', issue)
+      console.log('parsedBody', parsedBody)
+    }
+
     if (parsedBody && Object.keys(parsedBody).length > 0) {
       const startTime = parsedBody.time
       const startDate = parsedBody.date
